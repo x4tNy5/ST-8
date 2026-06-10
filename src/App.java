@@ -23,8 +23,7 @@ public class App {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("download.default_directory", resultDir.toString());
         prefs.put("download.prompt_for_download", false);
-        prefs.put("plugins.always_open_pdf_externally", true);
-
+        
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", prefs);
 
@@ -44,11 +43,10 @@ public class App {
             }
         }
 
-        webDriver.findElements(By.xpath("//input[@name='type']")).get(1).click();
-        webDriver.findElements(By.xpath("//input[@name='paper']")).get(1).click();
-        webDriver.findElement(By.xpath("//input[@type='checkbox']")).click();
+        webDriver.findElements(By.xpath("//input[@name='template']")).get(1).click();
+        webDriver.findElements(By.xpath("//input[@name='size']")).get(1).click();
 
-        WebElement btn = webDriver.findElement(By.xpath("//input[@type='submit']"));
+        WebElement btn = webDriver.findElement(By.xpath("//input[@name='submit']"));
         btn.submit();
 
         Path pdf = resultDir.resolve("papercdcase.pdf");
@@ -60,6 +58,10 @@ public class App {
         }
         if (Files.exists(pdf)) {
             Files.move(pdf, out, StandardCopyOption.REPLACE_EXISTING);
+         } else {
+            try (java.io.InputStream in = java.net.URI.create(webDriver.getCurrentUrl()).toURL().openStream()) {
+                Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
+            }
         }
 
         webDriver.quit();
